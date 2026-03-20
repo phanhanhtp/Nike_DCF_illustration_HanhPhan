@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nike Multi-Stage DCF Tool</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .badge-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      background: #e2e8f0;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+    }
+    .title {
+      font-size: 38px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .subtitle {
+      margin-top: 10px;
+      max-width: 780px;
+      color: #475569;
+      line-height: 1.6;
+    }
+    .note-card, .card {
+      background: white;
+      border-radius: 22px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      border: 1px solid #e2e8f0;
+    }
+    .note-card {
+      padding: 16px 18px;
+      min-width: 250px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+    }
+    .card {
+      padding: 22px;
+    }
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 24px;
+    }
+    .field {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    input[type="number"], input[type="range"] {
+      width: 100%;
+    }
+    input[type="number"] {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      font-size: 15px;
+      background: #fff;
+    }
+    .hint {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .slider-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .metric {
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      border: 1px solid #e2e8f0;
+    }
+    .metric-title {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+    .metric-value {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .section-title {
+      font-size: 24px;
+      margin: 0 0 16px 0;
+    }
+    .chart-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+    svg text {
+      font-size: 12px;
+      fill: #475569;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    th {
+      color: #64748b;
+      font-weight: 600;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .summary-box .label {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    .summary-box .value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .teaching-note {
+      color: #475569;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    .error {
+      color: #b91c1c;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    @media (max-width: 1050px) {
+      .grid { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .container { padding: 16px; }
+      .title { font-size: 28px; }
+      .metrics, .two-col, .summary-grid { grid-template-columns: 1fr; }
+      .metric-value { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <div class="badge-row">
+          <span class="badge">Multi-Stage DCF</span>
+          <span class="badge">Classroom Demo</span>
+          <span class="badge">Nike (NKE)</span>
+        </div>
+        <h1 class="title">Nike Intrinsic Value Estimator</h1>
+        <div class="subtitle">
+          Enter free cash flow and growth assumptions to estimate Nike’s intrinsic equity value using a two-stage discounted cash flow model plus a terminal value.
+        </div>
+      </div>
+      <div class="note-card">
+        <div style="font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:#64748b; margin-bottom:6px;">Default setup</div>
+        <div style="font-size:15px; font-weight:600;">Nike FY2025 FCF and shares prefilled</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Assumptions</h2>
+
+        <div class="field">
+          <label for="fcf">Base Free Cash Flow (billions USD)</label>
+          <input id="fcf" type="number" step="0.001" value="3.268" />
+          <div class="hint">Prefilled at 3.268 for Nike.</div>
+        </div>
+
+        <div class="two-col">
+          <div class="field">
+            <label for="growth1">Stage 1 growth (%)</label>
+            <input id="growth1" type="number" step="0.1" value="8" />
+          </div>
+          <div class="field">
+            <label for="years1">Stage 1 years</label>
+            <input id="years1" type="number" step="1" value="5" />
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="field">
+            <label for="growth2">Stage 2 growth (%)</label>
+            <input id="growth2" type="number" step="0.1" value="4" />
+          </div>
+          <div class="field">
+            <label for="years2">Stage 2 years</label>
+            <input id="years2" type="number" step="1" value="5" />
+          </div>
+        </div>
+
+        <div class="slider-box">
+          <div class="slider-top">
+            <label for="discountRate" style="margin:0;">Discount rate (WACC or required return)</label>
+            <strong><span id="discountRateLabel">9.0</span>%</strong>
+          </div>
+          <input id="discountRate" type="range" min="5" max="15" step="0.1" value="9" />
+        </div>
+
+        <div class="slider-box">
+          <div class="slider-top">
+            <label for="terminalGrowth" style="margin:0;">Terminal growth rate</label>
+            <strong><span id="terminalGrowthLabel">2.5</span>%</strong>
+          </div>
+          <input id="terminalGrowth" type="range" min="0" max="5" step="0.1" value="2.5" />
+          <div class="hint">Keep this below the discount rate.</div>
+        </div>
+
+        <div class="two-col">
+          <div class="field">
+            <label for="netDebt">Net debt (billions USD)</label>
+            <input id="netDebt" type="number" step="0.1" value="0" />
+            <div class="hint">Use negative values for net cash.</div>
+          </div>
+          <div class="field">
+            <label for="shares">Diluted shares outstanding (billions)</label>
+            <input id="shares" type="number" step="0.001" value="1.477" />
+            <div class="hint">Prefilled at 1.477 for Nike.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="marketPrice">Current market price (optional)</label>
+          <input id="marketPrice" type="number" step="0.01" value="0" />
+          <div class="hint">Enter a price to compare intrinsic value versus market price.</div>
+        </div>
+
+        <div id="errorBox" class="error" style="display:none;"></div>
+      </div>
+
+      <div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-title">Enterprise value</div>
+            <div class="metric-value" id="enterpriseValue">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-title">Equity value</div>
+            <div class="metric-value" id="equityValue">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-title">Intrinsic value/share</div>
+            <div class="metric-value" id="intrinsicValue">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-title">Upside / downside</div>
+            <div class="metric-value" id="upsideValue">—</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:24px;">
+          <h2 class="section-title">Forecast free cash flow path</h2>
+          <div style="display:flex; gap:20px; align-items:center; margin-bottom:10px; font-size:14px;">
+            <div><span style="display:inline-block;width:12px;height:12px;background:#2563eb;margin-right:6px;border-radius:3px;"></span>Stage 1 (High Growth)</div>
+            <div><span style="display:inline-block;width:12px;height:12px;background:#16a34a;margin-right:6px;border-radius:3px;"></span>Stage 2 (Mature Growth)</div>
+            <div><span style="display:inline-block;width:12px;height:12px;background:#dc2626;margin-right:6px;border-radius:3px;"></span>Terminal</div>
+          </div>
+          <div class="chart-wrap">
+            <svg id="chart" width="760" height="300" viewBox="0 0 760 300"></svg>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:24px;">
+          <h2 class="section-title">DCF breakdown</h2>
+          <div class="summary-grid">
+            <div class="summary-box">
+              <div class="label">PV of Stage 1 cash flows</div>
+              <div class="value" id="pvStage1">—</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">PV of Stage 2 cash flows</div>
+              <div class="value" id="pvStage2">—</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">PV of terminal value</div>
+              <div class="value" id="pvTerminal">—</div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Stage</th>
+                <th>Projected FCF</th>
+                <th>Present value</th>
+              </tr>
+            </thead>
+            <tbody id="forecastTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="teaching-note">
+            <strong style="color:#0f172a;">Teaching note:</strong> This tool is designed for classroom demonstrations. Students can see how changing growth rates, horizon lengths, discount rates, terminal growth, and net debt affects intrinsic value per share.<br><br>
+            Positive net debt reduces equity value. A negative net debt input represents net cash and increases equity value.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ids = [
+      'fcf', 'growth1', 'years1', 'growth2', 'years2',
+      'discountRate', 'terminalGrowth', 'netDebt', 'shares', 'marketPrice'
+    ];
+
+    const el = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+    const discountRateLabel = document.getElementById('discountRateLabel');
+    const terminalGrowthLabel = document.getElementById('terminalGrowthLabel');
+    const errorBox = document.getElementById('errorBox');
+
+    function fmtCurrency(value) {
+      if (!isFinite(value)) return '—';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function fmtBillions(value) {
+      if (!isFinite(value)) return '—';
+      return '$' + value.toFixed(2) + 'B';
+    }
+
+    function renderChart(rows, terminalFcf, stage1Count) {
+      const svg = document.getElementById('chart');
+      svg.innerHTML = '';
+
+      const width = 760;
+      const height = 300;
+      const margin = { top: 20, right: 24, bottom: 50, left: 62 };
+      const innerW = width - margin.left - margin.right;
+      const innerH = height - margin.top - margin.bottom;
+
+      if (!rows.length) return;
+
+      const chartRows = [...rows, { year: 'TV', stage: 'Terminal', fcf: terminalFcf }];
+      const values = chartRows.map(r => r.fcf);
+      const maxY = Math.max(...values) * 1.15;
+      const minY = 0;
+
+      function xScale(i) {
+        return margin.left + (i / (chartRows.length - 1)) * innerW;
+      }
+
+      function yScale(v) {
+        return margin.top + innerH - ((v - minY) / (maxY - minY)) * innerH;
+      }
+
+      const stage1Color = '#2563eb';
+      const stage2Color = '#16a34a';
+      const terminalColor = '#dc2626';
+      const axisColor = '#94a3b8';
+      const gridColor = '#e2e8f0';
+      const labelColor = '#475569';
+
+      // horizontal gridlines and y-axis labels
+      for (let i = 0; i <= 4; i++) {
+        const yVal = minY + (maxY - minY) * (i / 4);
+        const y = yScale(yVal);
+
+        const gridLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        gridLine.setAttribute('x1', margin.left);
+        gridLine.setAttribute('x2', margin.left + innerW);
+        gridLine.setAttribute('y1', y);
+        gridLine.setAttribute('y2', y);
+        gridLine.setAttribute('stroke', gridColor);
+        gridLine.setAttribute('stroke-width', '1');
+        svg.appendChild(gridLine);
+
+        const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        yLabel.setAttribute('x', 8);
+        yLabel.setAttribute('y', y + 4);
+        yLabel.setAttribute('fill', labelColor);
+        yLabel.textContent = '$' + yVal.toFixed(1) + 'B';
+        svg.appendChild(yLabel);
+      }
+
+      // axes
+      const axisX = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      axisX.setAttribute('x1', margin.left);
+      axisX.setAttribute('x2', margin.left + innerW);
+      axisX.setAttribute('y1', margin.top + innerH);
+      axisX.setAttribute('y2', margin.top + innerH);
+      axisX.setAttribute('stroke', axisColor);
+      axisX.setAttribute('stroke-width', '1.5');
+      svg.appendChild(axisX);
+
+      const axisY = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      axisY.setAttribute('x1', margin.left);
+      axisY.setAttribute('x2', margin.left);
+      axisY.setAttribute('y1', margin.top);
+      axisY.setAttribute('y2', margin.top + innerH);
+      axisY.setAttribute('stroke', axisColor);
+      axisY.setAttribute('stroke-width', '1.5');
+      svg.appendChild(axisY);
+
+      // stage divider
+      if (stage1Count > 0 && stage1Count < rows.length) {
+        const xDivider = (xScale(stage1Count - 1) + xScale(stage1Count)) / 2;
+        const divider = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        divider.setAttribute('x1', xDivider);
+        divider.setAttribute('x2', xDivider);
+        divider.setAttribute('y1', margin.top);
+        divider.setAttribute('y2', margin.top + innerH);
+        divider.setAttribute('stroke', '#cbd5e1');
+        divider.setAttribute('stroke-dasharray', '6 6');
+        divider.setAttribute('stroke-width', '1.5');
+        svg.appendChild(divider);
+      }
+
+      // continuous line segments across all years + TV
+      for (let i = 0; i < chartRows.length - 1; i++) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', xScale(i));
+        line.setAttribute('y1', yScale(chartRows[i].fcf));
+        line.setAttribute('x2', xScale(i + 1));
+        line.setAttribute('y2', yScale(chartRows[i + 1].fcf));
+
+        let color;
+        if (i < stage1Count - 1) color = stage1Color;
+        else if (i < rows.length - 1) color = stage2Color;
+        else color = terminalColor;
+
+        line.setAttribute('stroke', color);
+        line.setAttribute('stroke-width', '3');
+        svg.appendChild(line);
+      }
+
+      // dots and x-axis labels
+      chartRows.forEach((row, i) => {
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', xScale(i));
+        dot.setAttribute('cy', yScale(row.fcf));
+        dot.setAttribute('r', row.stage === 'Terminal' ? '6' : '4');
+
+        let color = stage2Color;
+        if (row.stage === 'Stage 1') color = stage1Color;
+        if (row.stage === 'Terminal') color = terminalColor;
+
+        dot.setAttribute('fill', color);
+        svg.appendChild(dot);
+
+        const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        xLabel.setAttribute('x', xScale(i));
+        xLabel.setAttribute('y', margin.top + innerH + 24);
+        xLabel.setAttribute('text-anchor', 'middle');
+        xLabel.setAttribute('fill', labelColor);
+        xLabel.textContent = row.year;
+        svg.appendChild(xLabel);
+      });
+    }
+
+    function calculate() {
+      discountRateLabel.textContent = Number(el.discountRate.value).toFixed(1);
+      terminalGrowthLabel.textContent = Number(el.terminalGrowth.value).toFixed(1);
+
+      const fcf0 = parseFloat(el.fcf.value);
+      const g1 = parseFloat(el.growth1.value) / 100;
+      const n1 = parseInt(el.years1.value, 10);
+      const g2 = parseFloat(el.growth2.value) / 100;
+      const n2 = parseInt(el.years2.value, 10);
+      const r = parseFloat(el.discountRate.value) / 100;
+      const tg = parseFloat(el.terminalGrowth.value) / 100;
+      const nd = parseFloat(el.netDebt.value);
+      const sh = parseFloat(el.shares.value);
+      const mp = parseFloat(el.marketPrice.value);
+
+      const valid = [fcf0, g1, n1, g2, n2, r, tg, nd, sh].every(Number.isFinite) && fcf0 > 0 && sh > 0 && n1 >= 0 && n2 >= 0;
+
+      if (!valid) {
+        errorBox.style.display = 'block';
+        errorBox.textContent = 'Please enter valid numeric inputs. Base FCF and shares outstanding must be positive.';
+        return;
+      }
+      if (r <= tg) {
+        errorBox.style.display = 'block';
+        errorBox.textContent = 'The discount rate must be greater than the terminal growth rate.';
+        return;
+      }
+      errorBox.style.display = 'none';
+
+      let currentFcf = fcf0;
+      let pvStage1 = 0;
+      let pvStage2 = 0;
+      let yearIndex = 0;
+      const rows = [];
+
+      for (let i = 1; i <= n1; i++) {
+        yearIndex += 1;
+        currentFcf *= (1 + g1);
+        const pv = currentFcf / Math.pow(1 + r, yearIndex);
+        pvStage1 += pv;
+        rows.push({ year: 'Y' + yearIndex, stage: 'Stage 1', fcf: currentFcf, pv });
+      }
+
+      for (let i = 1; i <= n2; i++) {
+        yearIndex += 1;
+        currentFcf *= (1 + g2);
+        const pv = currentFcf / Math.pow(1 + r, yearIndex);
+        pvStage2 += pv;
+        rows.push({ year: 'Y' + yearIndex, stage: 'Stage 2', fcf: currentFcf, pv });
+      }
+
+      const terminalFcf = currentFcf * (1 + tg);
+      const terminalValue = terminalFcf / (r - tg);
+      const pvTerminal = terminalValue / Math.pow(1 + r, yearIndex);
+      const enterpriseValue = pvStage1 + pvStage2 + pvTerminal;
+      const equityValue = enterpriseValue - nd;
+      const intrinsicValue = equityValue / sh;
+      const upside = mp > 0 ? ((intrinsicValue - mp) / mp) * 100 : null;
+
+      document.getElementById('enterpriseValue').textContent = fmtBillions(enterpriseValue);
+      document.getElementById('equityValue').textContent = fmtBillions(equityValue);
+      document.getElementById('intrinsicValue').textContent = fmtCurrency(intrinsicValue);
+      document.getElementById('upsideValue').textContent = upside === null ? 'Add market price' : upside.toFixed(1) + '%';
+
+      document.getElementById('pvStage1').textContent = fmtBillions(pvStage1);
+      document.getElementById('pvStage2').textContent = fmtBillions(pvStage2);
+      document.getElementById('pvTerminal').textContent = fmtBillions(pvTerminal);
+
+      const tbody = document.getElementById('forecastTableBody');
+      tbody.innerHTML = '';
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.year}</td>
+          <td>${row.stage}</td>
+          <td>${fmtBillions(row.fcf)}</td>
+          <td>${fmtBillions(row.pv)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const terminalRow = document.createElement('tr');
+      terminalRow.innerHTML = `
+        <td><strong>Terminal</strong></td>
+        <td><strong>Perpetuity</strong></td>
+        <td><strong>${fmtBillions(terminalFcf)}</strong></td>
+        <td><strong>${fmtBillions(pvTerminal)}</strong></td>
+      `;
+      tbody.appendChild(terminalRow);
+
+      renderChart(rows, terminalFcf, n1);
+    }
+
+    ids.forEach(id => el[id].addEventListener('input', calculate));
+    calculate();
+  </script>
+</body>
+</html>
